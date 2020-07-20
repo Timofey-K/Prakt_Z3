@@ -11,6 +11,7 @@ namespace Zadanie_3.Models
         public string Name { get; set; }
         public string Family { get; set; }
         public DateTime Date { get; set; }
+        public int IdReward { get; set; }
         public string Reward { get; set; }
 
     }

@@ -4,24 +4,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Zadanie_3.Models;
+using Zadanie_3.Services;
 
 namespace Zadanie_3.Controllers
 {
     public class UserController:Controller
     {
-        private static List<UserModel> _Users = new List<UserModel>
+        private IStorage _userStorage;
+        public UserController(IStorage storage)
         {
-            new UserModel {Id=1, Name="Ваня", Family="Петров", Date=DateTime.Now, Reward="За честность"},
-            new UserModel {Id=2, Name="Соня", Family="Зубова", Date=DateTime.Now, Reward="За красоту"}
-        };
-
-        public UserController()
-        {
-
+            _userStorage = storage;
         }
         public IActionResult Index()
         {
-            return View(_Users);
+            return View(_userStorage.GetUsersList());
         }
 
         [HttpGet]
@@ -32,8 +28,7 @@ namespace Zadanie_3.Controllers
         [HttpPost]
         public IActionResult Add(UserModel newUser)
         {
-            newUser.Id = _Users.Max(m => m.Id) + 1;
-            _Users.Add(newUser);
+            _userStorage.AddUser(newUser);
             return RedirectToAction(nameof(Index));
         }
 
@@ -42,17 +37,16 @@ namespace Zadanie_3.Controllers
         {
             if (!userId.HasValue)
                 return RedirectToAction(nameof(Index));
-            UserModel editedUser = _Users.FirstOrDefault(u => u.Id == userId.Value);
+            UserModel editedUser = _userStorage.GetUsersList().FirstOrDefault(u => u.Id == userId.Value);
             if (editedUser == null)
                 return NotFound();
-            _Users.Remove(editedUser);
+            
             return View(editedUser);
         }
         [HttpPost]
         public IActionResult Edit(UserModel editedUser)
         {
-            editedUser.Id = _Users.Max(m => m.Id) + 1;
-            _Users.Add(editedUser);
+            _userStorage.UpdateUser(editedUser);
             return RedirectToAction(nameof(Index));
         }
 
@@ -60,10 +54,10 @@ namespace Zadanie_3.Controllers
         {
             if (!userId.HasValue)
                 return RedirectToAction(nameof(Index));
-            UserModel userRemove = _Users.FirstOrDefault(u => u.Id == userId.Value);
-            if (userRemove == null)
+            UserModel userRemove = _userStorage.GetUsersList().FirstOrDefault(u => u.Id == userId.Value);
+            bool success = _userStorage.RemoveUserById(userRemove.Id);
+            if (!success)
                 return NotFound();
-            _Users.Remove(userRemove);
             return RedirectToAction(nameof(Index));
         }
     }

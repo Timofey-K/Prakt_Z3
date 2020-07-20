@@ -1,27 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Zadanie_3.Models;
+using Zadanie_3.Services;
 
 namespace Zadanie_3.Controllers
 {
-    public class RewardController:Controller
-    {
-        private static List<RewardModel> _Rewards = new List<RewardModel>
+    public class RewardController : Controller
+    {    
+        private IStorage _rewardStorage;
+        public RewardController(IStorage storage)
         {
-            new RewardModel {Id=1, Name="За честность", Description="Не врал"},
-            new RewardModel {Id=2, Name="За красоту", Description="Лучший наряд"}
-        };
-
-        public RewardController()
-        {
-
+            _rewardStorage = storage;
         }
         public IActionResult Index()
         {
-            return View(_Rewards);
+            return View(_rewardStorage.GetRewardsList());
         }
 
         [HttpGet]
@@ -32,8 +26,7 @@ namespace Zadanie_3.Controllers
         [HttpPost]
         public IActionResult Add(RewardModel newReward)
         {
-            newReward.Id = _Rewards.Max(m => m.Id) + 1;
-            _Rewards.Add(newReward);
+            _rewardStorage.AddReward(newReward);
             return RedirectToAction(nameof(Index));
         }
 
@@ -42,17 +35,15 @@ namespace Zadanie_3.Controllers
         {
             if (!rewardId.HasValue)
                 return RedirectToAction(nameof(Index));
-            RewardModel editedReward = _Rewards.FirstOrDefault(u => u.Id == rewardId.Value);
+            RewardModel editedReward = _rewardStorage.GetRewardsList().FirstOrDefault(r => r.Id == rewardId.Value);
             if (editedReward == null)
-                return NotFound();
-            _Rewards.Remove(editedReward);
+                return NotFound();            
             return View(editedReward);
         }
         [HttpPost]
         public IActionResult Edit(RewardModel editedReward)
         {
-            editedReward.Id = _Rewards.Max(m => m.Id) + 1;
-            _Rewards.Add(editedReward);
+            _rewardStorage.UpdateReward(editedReward);            
             return RedirectToAction(nameof(Index));
         }
 
@@ -60,12 +51,12 @@ namespace Zadanie_3.Controllers
         {
             if (!rewardId.HasValue)
                 return RedirectToAction(nameof(Index));
-            RewardModel rewardRemove = _Rewards.FirstOrDefault(u => u.Id == rewardId.Value);
-            if (rewardRemove == null)
+            RewardModel rewardRemove = _rewardStorage.GetRewardsList().FirstOrDefault(r => r.Id == rewardId.Value);
+            bool success = _rewardStorage.RemoveRewardById(rewardRemove.Id);
+            if (!success)
                 return NotFound();
-            _Rewards.Remove(rewardRemove);
             return RedirectToAction(nameof(Index));
         }
-    
-}
+
+    }
 }
