@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Zadanie_3.Models;
-using Zadanie_3.Services;
+using Practice.Common;
+
 
 namespace Zadanie_3.Controllers
 {
@@ -17,7 +16,7 @@ namespace Zadanie_3.Controllers
         }
         public IActionResult Index()
         {
-            return View(_userStorage.GetUsersList());
+            return View(_userStorage.GetUsersList().Select(x=>x.ConvertToViewModel));
         }
 
         [HttpGet]
@@ -26,9 +25,9 @@ namespace Zadanie_3.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult Add(UserModel newUser)
+        public IActionResult Add(UserViewModel newUser)
         {
-            _userStorage.AddUser(newUser);
+            _userStorage.AddUser(newUser.ConvertTodomainModel());
             return RedirectToAction(nameof(Index));
         }
 
@@ -37,14 +36,14 @@ namespace Zadanie_3.Controllers
         {
             if (!userId.HasValue)
                 return RedirectToAction(nameof(Index));
-            UserModel editedUser = _userStorage.GetUsersList().FirstOrDefault(u => u.Id == userId.Value);
+            UserViewModel editedUser = _userStorage.GetUsersList().FirstOrDefault(u => u.Id == userId.Value);
             if (editedUser == null)
                 return NotFound();
             
             return View(editedUser);
         }
         [HttpPost]
-        public IActionResult Edit(UserModel editedUser)
+        public IActionResult Edit(UserViewModel editedUser)
         {
             _userStorage.UpdateUser(editedUser);
             return RedirectToAction(nameof(Index));
@@ -54,11 +53,17 @@ namespace Zadanie_3.Controllers
         {
             if (!userId.HasValue)
                 return RedirectToAction(nameof(Index));
-            UserModel userRemove = _userStorage.GetUsersList().FirstOrDefault(u => u.Id == userId.Value);
+            UserViewModel userRemove = _userStorage.GetUsersList().FirstOrDefault(u => u.Id == userId.Value);
             bool success = _userStorage.RemoveUserById(userRemove.Id);
             if (!success)
                 return NotFound();
             return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult Details(int userId)
+        {
+            IEnumerable<UserViewModel> users = _userStorage.GetRewardsByUserId(userId);
+            return View(users);
         }
     }
 }

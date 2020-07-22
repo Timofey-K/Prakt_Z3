@@ -5,35 +5,22 @@ using Zadanie_3.Models;
 
 namespace Zadanie_3.Services
 {
-    public interface IStorage
-    {
-        int AddReward(RewardModel reward);
-        int AddUser(UserModel user);
-        bool RemoveRewardById(int id);
-        bool RemoveUserById(int id);
-        IEnumerable<RewardModel> GetRewardsList();
-        IEnumerable<UserModel> GetUsersList();
-        int UpdateReward(RewardModel reward);
-        int UpdateUser(UserModel user);
-        IEnumerable<UserModel> GetRewardsByUserId(int id);
-        int RewardUser(int userId, int rewardId);
-        bool RemoveReward(int userId, int rewardId);
-    }
+    
 
     public class InMemoryStorage : IStorage
     {
-        List<RewardModel> _RewardStorage = new List<RewardModel>
+        List<RewardViewModel> _RewardStorage = new List<RewardViewModel>
         {
-            new RewardModel {Id=1, Name="За честность", Description="Не врал"},
-            new RewardModel {Id=2, Name="За красоту", Description="Лучший наряд"}
+            new RewardViewModel {Id=1, Title="За честность", Description="Не врал"},
+            new RewardViewModel {Id=2, Title="За красоту", Description="Лучший наряд"}
         };
-        List<UserModel> _UserStorage = new List<UserModel>
+        List<UserViewModel> _UserStorage = new List<UserViewModel>
         {
-           new UserModel {Id=1, Name="Ваня", Family="Петров", Date=DateTime.Now, Reward="За честность"},
-           new UserModel {Id=2, Name="Соня", Family="Зубова", Date=DateTime.Now, Reward="За красоту"}
+           new UserViewModel {Id=1, Name="Ваня", Family="Петров", Date=DateTime.Now, Reward="За честность"},
+           new UserViewModel {Id=2, Name="Соня", Family="Зубова", Date=DateTime.Now, Reward="За красоту"}
         };
 
-        public int AddReward(RewardModel reward)
+        public int AddReward(RewardViewModel reward)
         {
             int index = _RewardStorage.Any() ? _RewardStorage.Max(m => m.Id) + 1 : 0;
             reward.Id = index;
@@ -41,7 +28,7 @@ namespace Zadanie_3.Services
             return index;
         }
 
-        public int AddUser(UserModel user)
+        public int AddUser(UserViewModel user)
         {
             int index = _UserStorage.Any() ? _UserStorage.Max(m => m.Id) + 1 : 0;
             user.Id = index;
@@ -49,10 +36,10 @@ namespace Zadanie_3.Services
             return index;
         }
 
-        public IEnumerable<UserModel> GetRewardsByUserId(int id)
+        public IEnumerable<UserViewModel> GetRewardsByUserId(int id)
         {
-            List<UserModel> rewardsUser = new List<UserModel>();
-            foreach (UserModel user in _UserStorage)
+            List<UserViewModel> rewardsUser = new List<UserViewModel>();
+            foreach (UserViewModel user in _UserStorage)
             {
                 if (user.Id == id)
                 {
@@ -62,27 +49,27 @@ namespace Zadanie_3.Services
             return rewardsUser;
         }
 
-        public IEnumerable<RewardModel> GetRewardsList()
+        public IEnumerable<RewardViewModel> GetRewardsList()
         {
             return _RewardStorage;
         }
 
-        public IEnumerable<UserModel> GetUsersList()
+        public IEnumerable<UserViewModel> GetUsersList()
         {
             return _UserStorage;
         }
 
         public bool RemoveReward(int userId, int rewardId)
         {
-            foreach (UserModel user in _UserStorage)
+            foreach (UserViewModel user in _UserStorage)
             {
                 if (user.Id == userId)
                 {
-                    foreach (RewardModel reward in _RewardStorage)
+                    foreach (RewardViewModel reward in _RewardStorage)
                     {
                         if (reward.Id == rewardId)
                         {
-                            if (user.Reward == reward.Name)
+                            if (user.Reward == reward.Title)
                             {
                                 return _UserStorage.Remove(user);
                             }
@@ -107,16 +94,16 @@ namespace Zadanie_3.Services
 
         public int RewardUser(int userId, int rewardId)
         {
-            UserModel user = _UserStorage.FirstOrDefault(note => note.Id == userId);
-            RewardModel reward = _RewardStorage.FirstOrDefault(note => note.Id == rewardId);
-            user.Reward = reward.Name;
+            UserViewModel user = _UserStorage.FirstOrDefault(note => note.Id == userId);
+            RewardViewModel reward = _RewardStorage.FirstOrDefault(note => note.Id == rewardId);
+            user.Reward = reward.Title;
             int index = _UserStorage.Max(m => m.Id) + 1;
             user.Id = index;
             _UserStorage.Add(user);
             return index;
         }
 
-        public int UpdateReward(RewardModel reward)
+        public int UpdateReward(RewardViewModel reward)
         {
             int index = reward.Id;
             if (RemoveRewardById(index))
@@ -126,7 +113,7 @@ namespace Zadanie_3.Services
             return reward.Id;
         }
 
-        public int UpdateUser(UserModel user)
+        public int UpdateUser(UserViewModel user)
         {
             if (RemoveUserById(user.Id))
             {

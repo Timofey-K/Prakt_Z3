@@ -113,3 +113,4 @@ C:\Users\timca\source\repos\Zadanie_3\obj\Debug\netcoreapp3.1\Razor\Views\User\E
 C:\Users\timca\source\repos\Zadanie_3\obj\Debug\netcoreapp3.1\Razor\Views\Reward\Index.cshtml.g.cs
 C:\Users\timca\source\repos\Zadanie_3\obj\Debug\netcoreapp3.1\Razor\Views\Reward\Add.cshtml.g.cs
 C:\Users\timca\source\repos\Zadanie_3\obj\Debug\netcoreapp3.1\Razor\Views\Reward\Edit.cshtml.g.cs
+C:\Users\timca\source\repos\Zadanie_3\obj\Debug\netcoreapp3.1\Razor\Views\User\Details.cshtml.g.cs

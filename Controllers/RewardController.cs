@@ -24,7 +24,7 @@ namespace Zadanie_3.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult Add(RewardModel newReward)
+        public IActionResult Add(RewardViewModel newReward)
         {
             _rewardStorage.AddReward(newReward);
             return RedirectToAction(nameof(Index));
@@ -35,13 +35,13 @@ namespace Zadanie_3.Controllers
         {
             if (!rewardId.HasValue)
                 return RedirectToAction(nameof(Index));
-            RewardModel editedReward = _rewardStorage.GetRewardsList().FirstOrDefault(r => r.Id == rewardId.Value);
+            RewardViewModel editedReward = _rewardStorage.GetRewardsList().FirstOrDefault(r => r.Id == rewardId.Value);
             if (editedReward == null)
                 return NotFound();            
             return View(editedReward);
         }
         [HttpPost]
-        public IActionResult Edit(RewardModel editedReward)
+        public IActionResult Edit(RewardViewModel editedReward)
         {
             _rewardStorage.UpdateReward(editedReward);            
             return RedirectToAction(nameof(Index));
@@ -51,12 +51,12 @@ namespace Zadanie_3.Controllers
         {
             if (!rewardId.HasValue)
                 return RedirectToAction(nameof(Index));
-            RewardModel rewardRemove = _rewardStorage.GetRewardsList().FirstOrDefault(r => r.Id == rewardId.Value);
+            RewardViewModel rewardRemove = _rewardStorage.GetRewardsList().FirstOrDefault(r => r.Id == rewardId.Value);
             bool success = _rewardStorage.RemoveRewardById(rewardRemove.Id);
             if (!success)
                 return NotFound();
             return RedirectToAction(nameof(Index));
         }
-
+         
     }
 }
