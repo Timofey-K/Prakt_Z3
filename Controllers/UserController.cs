@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
+using Zadanie.Common;
 using Zadanie_3.Models;
-using Practice.Common;
 
 
 namespace Zadanie_3.Controllers
@@ -16,7 +16,7 @@ namespace Zadanie_3.Controllers
         }
         public IActionResult Index()
         {
-            return View(_userStorage.GetUsersList().Select(x=>x.ConvertToViewModel));
+            return View(_userStorage.GetUsersList().Select(x=>x.ConvertToViewModelU()));
         }
 
         [HttpGet]
@@ -27,7 +27,7 @@ namespace Zadanie_3.Controllers
         [HttpPost]
         public IActionResult Add(UserViewModel newUser)
         {
-            _userStorage.AddUser(newUser.ConvertTodomainModel());
+            _userStorage.AddUser(newUser.ConvertToDomainModelU());
             return RedirectToAction(nameof(Index));
         }
 
@@ -36,7 +36,7 @@ namespace Zadanie_3.Controllers
         {
             if (!userId.HasValue)
                 return RedirectToAction(nameof(Index));
-            UserViewModel editedUser = _userStorage.GetUsersList().FirstOrDefault(u => u.Id == userId.Value);
+            UserViewModel editedUser = _userStorage.GetUsersList().FirstOrDefault(u => u.Id == userId.Value).ConvertToViewModelU();
             if (editedUser == null)
                 return NotFound();
             
@@ -45,25 +45,28 @@ namespace Zadanie_3.Controllers
         [HttpPost]
         public IActionResult Edit(UserViewModel editedUser)
         {
-            _userStorage.UpdateUser(editedUser);
+            _userStorage.UpdateUser(editedUser.ConvertToDomainModelU());
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpGet]
         public IActionResult Delete(int? userId)
         {
             if (!userId.HasValue)
                 return RedirectToAction(nameof(Index));
-            UserViewModel userRemove = _userStorage.GetUsersList().FirstOrDefault(u => u.Id == userId.Value);
-            bool success = _userStorage.RemoveUserById(userRemove.Id);
+            UserViewModel userRemove = _userStorage.GetUsersList().FirstOrDefault(u => u.Id == userId.Value).ConvertToViewModelU();
+     
+            if (userRemove == null)
+                return NotFound();
+            return View(userRemove);
+        }
+        [HttpPost]
+        public IActionResult Delete(int userId)
+        {
+            bool success = _userStorage.RemoveUserById(userId);
             if (!success)
                 return NotFound();
             return RedirectToAction(nameof(Index));
-        }
-
-        public IActionResult Details(int userId)
-        {
-            IEnumerable<UserViewModel> users = _userStorage.GetRewardsByUserId(userId);
-            return View(users);
-        }
+        }        
     }
 }

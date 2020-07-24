@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Zadanie.Common.Models;
 using Zadanie_3.Models;
 
 namespace Zadanie_3
 {
     public static class Converter
     {
-        public static UserViewModel ConvertToViewModel( this UserModel domainModel)
+        public static UserViewModel ConvertToViewModelU(this UserModel domainModel)
         {
             return new UserViewModel()
             {
@@ -16,19 +13,39 @@ namespace Zadanie_3
                 FirstName = domainModel.FirstName,
                 LastName = domainModel.LastName,
                 Birthdate = domainModel.Birthdate,
-                Rewards = domainModel.Rewards
+                //Rewards = domainModel.Rewards
             };
         }
 
-        public static UserModel ConvertTodomainModel(this UserViewModel viewModel)
+        public static UserModel ConvertToDomainModelU(this UserViewModel viewModel)
         {
-            return new UserViewModel()
+            return new UserModel()
             {
                 Id = viewModel.Id,
                 FirstName = viewModel.FirstName,
                 LastName = viewModel.LastName,
                 Birthdate = viewModel.Birthdate,
-                Rewards = viewModel.Rewards
+                //Rewards = viewModel.Rewards
+            };
+        }
+
+        public static RewardViewModel ConvertToViewModelR(this RewardModel domainModel)
+        {
+            return new RewardViewModel()
+            {
+                Id = domainModel.Id,
+                Title = domainModel.Title,
+                Description = domainModel.Description
+            };
+        }
+
+        public static RewardModel ConvertToDomainModelR(this RewardViewModel viewModel)
+        {
+            return new RewardModel()
+            {
+                Id = viewModel.Id,
+                Title = viewModel.Title,
+                Description = viewModel.Description
             };
         }
     }

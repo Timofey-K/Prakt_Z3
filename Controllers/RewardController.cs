@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Linq;
+using Zadanie.Common;
 using Zadanie_3.Models;
-using Zadanie_3.Services;
 
 namespace Zadanie_3.Controllers
 {
     public class RewardController : Controller
-    {    
+    {
         private IStorage _rewardStorage;
         public RewardController(IStorage storage)
         {
@@ -15,7 +14,7 @@ namespace Zadanie_3.Controllers
         }
         public IActionResult Index()
         {
-            return View(_rewardStorage.GetRewardsList());
+            return View(_rewardStorage.GetRewardsList().Select(x => x.ConvertToViewModelR()));
         }
 
         [HttpGet]
@@ -26,37 +25,52 @@ namespace Zadanie_3.Controllers
         [HttpPost]
         public IActionResult Add(RewardViewModel newReward)
         {
-            _rewardStorage.AddReward(newReward);
+            _rewardStorage.AddReward(newReward.ConvertToDomainModelR());
             return RedirectToAction(nameof(Index));
         }
+
+
+
 
         [HttpGet]
         public IActionResult Edit(int? rewardId)
         {
             if (!rewardId.HasValue)
                 return RedirectToAction(nameof(Index));
-            RewardViewModel editedReward = _rewardStorage.GetRewardsList().FirstOrDefault(r => r.Id == rewardId.Value);
+            RewardViewModel editedReward = _rewardStorage.GetRewardsList().FirstOrDefault(r => r.Id == rewardId.Value).ConvertToViewModelR();
             if (editedReward == null)
-                return NotFound();            
+                return NotFound();
             return View(editedReward);
         }
         [HttpPost]
         public IActionResult Edit(RewardViewModel editedReward)
         {
-            _rewardStorage.UpdateReward(editedReward);            
+            _rewardStorage.UpdateReward(editedReward.ConvertToDomainModelR());
             return RedirectToAction(nameof(Index));
         }
 
+
+
+
+        [HttpGet]
         public IActionResult Delete(int? rewardId)
         {
             if (!rewardId.HasValue)
                 return RedirectToAction(nameof(Index));
-            RewardViewModel rewardRemove = _rewardStorage.GetRewardsList().FirstOrDefault(r => r.Id == rewardId.Value);
-            bool success = _rewardStorage.RemoveRewardById(rewardRemove.Id);
+            RewardViewModel rewardRemove = _rewardStorage.GetRewardsList().FirstOrDefault(r => r.Id == rewardId.Value).ConvertToViewModelR();
+            if (rewardRemove == null)
+                return NotFound();
+            return View(rewardRemove);
+        }
+        [HttpPost]
+        public IActionResult Delete(int rewardId)
+        {
+            bool success = _rewardStorage.RemoveRewardById(rewardId);
+
             if (!success)
                 return NotFound();
+
             return RedirectToAction(nameof(Index));
         }
-         
     }
 }
